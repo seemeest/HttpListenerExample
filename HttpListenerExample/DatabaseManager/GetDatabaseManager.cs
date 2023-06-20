@@ -147,7 +147,7 @@ namespace HttpListenerExample
             {
                 connection.Open();
 
-                string query = "SELECT * FROM `doctors`";
+                string query = "SELECT * FROM doctors";
 
                 using (MySqlCommand command = new MySqlCommand(query, connection))
                 {
@@ -156,11 +156,13 @@ namespace HttpListenerExample
                         while (reader.Read())
                         {
                             Doctor doctor = new Doctor();
-                            doctor.DoctorId = reader.GetInt32(0);
-                            doctor.FirstName = reader.GetString(1);
-                            doctor.LastName = reader.GetString(2);
-                            doctor.Specialization = reader.GetString(3);
-                            doctor.PhoneNumber = reader.GetString(4);
+                            doctor.DoctorId = reader.GetInt32("doctor_id");
+                            doctor.FirstName = reader.GetString("first_name");
+                            doctor.LastName = reader.GetString("last_name");
+                            doctor.Specialization = reader.GetString("specialization");
+                            doctor.PhoneNumber = reader.GetString("phone_number");
+                            doctor.mobile_number = reader.IsDBNull(reader.GetOrdinal("mobile_number")) ? null : reader.GetString("mobile_number");
+                            doctor.address = reader.IsDBNull(reader.GetOrdinal("address")) ? null : reader.GetString("address");
 
                             doctors.Add(doctor);
                         }
@@ -170,6 +172,7 @@ namespace HttpListenerExample
 
             return doctors;
         }
+
 
         public static List<Prescription> GetPrescriptionsFromDatabase()
         {

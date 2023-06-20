@@ -229,10 +229,10 @@ namespace HttpListenerExample
             {
                 connection.Open();
 
-                string insertQuery = "INSERT INTO `doctors` (`first_name`, `last_name`, `specialization`, `phone_number`) " +
-                    "VALUES (@FirstName, @LastName, @Specialization, @PhoneNumber)";
+                string insertQuery = "INSERT INTO `doctors` (`first_name`, `last_name`, `specialization`, `phone_number` , `mobile_number` , `address`) " +
+                    "VALUES (@FirstName, @LastName, @Specialization, @PhoneNumber, @mobile_number, @address)";
 
-                string updateQuery = "UPDATE `doctors` SET `first_name` = @FirstName, `last_name` = @LastName, " +
+                string updateQuery = "UPDATE `doctors` SET `first_name` = @FirstName, `last_name` = @LastName, `mobile_number` = @mobile_number, `address` = @address, " +
                     "`specialization` = @Specialization, `phone_number` = @PhoneNumber WHERE `doctor_id` = @DoctorId";
 
                 foreach (Doctor doctor in doctors)
@@ -260,6 +260,8 @@ namespace HttpListenerExample
                         command.Parameters.AddWithValue("@LastName", doctor.LastName);
                         command.Parameters.AddWithValue("@Specialization", doctor.Specialization);
                         command.Parameters.AddWithValue("@PhoneNumber", doctor.PhoneNumber);
+                        command.Parameters.AddWithValue("@mobile_number", doctor.mobile_number);
+                        command.Parameters.AddWithValue("@address", doctor.address);
 
                         try
                         {
