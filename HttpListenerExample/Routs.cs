@@ -59,7 +59,15 @@ namespace HttpListenerExample
                 {
                     List<Prescription> prescription = DatabaseManager.GetPrescriptionsFromDatabase();
                     await ResponseManager.SendResponseData(context, prescription);
+
                 }
+                else if (request.Url.AbsolutePath == "/GetUserId")
+                {
+                    Doctor doctor = await DatabaseManager.GetUsersId(request);
+                    await ResponseManager.SendResponseData(context, doctor);
+
+                }
+
                 
 
                 /////////////////////////////////////
@@ -71,7 +79,6 @@ namespace HttpListenerExample
                     {
                         List<Appointment> appointment = DatabaseManager.GetAppointmentsFromDatabase();
                         await ResponseManager.SendResponseData(context, appointment);
-                        await Console.Out.WriteLineAsync(" Stat 200");
                     }
 
                 }
@@ -83,7 +90,6 @@ namespace HttpListenerExample
                     {
                         List<Diagnosis> diagnosi = DatabaseManager.GetDiagnosisFromDatabase();
                         await ResponseManager.SendResponseData(context, diagnosi);
-                        await Console.Out.WriteLineAsync(" Stat 200");
                     }
 
                 }
@@ -95,7 +101,6 @@ namespace HttpListenerExample
                     {
                         List<Patient> patient = DatabaseManager.GetPatientsFromDatabase();
                         await ResponseManager.SendResponseData(context, patient);
-                        await Console.Out.WriteLineAsync(" Stat 200");
                     }
 
                 }
@@ -107,7 +112,6 @@ namespace HttpListenerExample
                     {
                         List<Department> department = DatabaseManager.GetDepartmentsFromDatabase();
                         await ResponseManager.SendResponseData(context, department);
-                        await Console.Out.WriteLineAsync(" Stat 200");
                     }
                 }
                 else if (request.Url.AbsolutePath == "/setDoctors")
@@ -118,7 +122,6 @@ namespace HttpListenerExample
                     {
                         List<Doctor> doctor = DatabaseManager.GetDoctorsFromDatabase();
                         await ResponseManager.SendResponseData(context, doctor);
-                        await Console.Out.WriteLineAsync(" Stat 200");
                     }
 
                 }
@@ -130,10 +133,9 @@ namespace HttpListenerExample
                     {
                         List<Prescription> prescription = DatabaseManager.GetPrescriptionsFromDatabase();
                         await ResponseManager.SendResponseData(context, prescription);
-                        await Console.Out.WriteLineAsync(" Stat 200");
                     }
-                }
-
+                } 
+                
             }
 
             response.Close();

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -173,6 +174,38 @@ namespace HttpListenerExample
             return doctors;
         }
 
+        public static Doctor GetDoctorsFromDatabase(int doctorId)
+        {
+            Doctor doctor = new Doctor();
+            using (MySqlConnection connection = new MySqlConnection(connStr))
+            {
+                connection.Open();
+
+                string query = $"SELECT * FROM `doctors` WHERE doctor_id ={doctorId}";
+
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+
+                            doctor.DoctorId = reader.GetInt32("doctor_id");
+                            doctor.FirstName = reader.GetString("first_name");
+                            doctor.LastName = reader.GetString("last_name");
+                            doctor.Specialization = reader.GetString("specialization");
+                            doctor.PhoneNumber = reader.GetString("phone_number");
+                            doctor.mobile_number = reader.IsDBNull(reader.GetOrdinal("mobile_number")) ? null : reader.GetString("mobile_number");
+                            doctor.address = reader.IsDBNull(reader.GetOrdinal("address")) ? null : reader.GetString("address");
+
+                        }
+                    }
+                }
+            }
+
+            return doctor;
+        }
+
 
         public static List<Prescription> GetPrescriptionsFromDatabase()
         {
@@ -206,6 +239,51 @@ namespace HttpListenerExample
         }
 
         ////////////////////////////////////////////////////////////////
+    
+        public static async Task<Doctor>   GetUsersId(HttpListenerRequest request)
+        {
+            Doctor doctor = new Doctor();
+            int userId = 0;
+            string authorizationHeader = request.Headers["Authorization"];
+            if (authorizationHeader != null && authorizationHeader.StartsWith("Basic "))
+            {
+                string credentials = authorizationHeader.Substring("Basic ".Length).Trim();
+                string decodedCredentials = Encoding.UTF8.GetString(Convert.FromBase64String(credentials));
+
+                string[] parts = decodedCredentials.Split(':');
+                if (parts.Length == 2)
+                {
+                    string username = parts[0];
+                    string password = parts[1];
+
+                    using (MySqlConnection connection = new MySqlConnection(connStr))
+                    {
+                        connection.Open();
+
+                        string query = $"SELECT doctor_id FROM doctors WHERE login = '{username}' AND password = '{password}' LIMIT 0, 50";
+
+
+                        using (MySqlCommand command = new MySqlCommand(query, connection))
+                        {
+
+                            using (MySqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    userId = reader.GetInt32(0);
+                                    Console.WriteLine($"userId {userId}");
+                                }
+                            }
+
+                        }
+                    }
+                }
+             
+            }
+           
+
+            return GetDoctorsFromDatabase(userId);
+        }
         public static bool IsClientAuthorized(HttpListenerRequest request)
         {
             string authorizationHeader = request.Headers["Authorization"];
@@ -225,7 +303,7 @@ namespace HttpListenerExample
                     {
                         connection.Open();
 
-                        string query = "SELECT COUNT(*) FROM clients WHERE username = @username AND password = @password";
+                        string query = "SELECT COUNT(*) FROM doctors WHERE login = @username AND password = @password";
                         using (MySqlCommand command = new MySqlCommand(query, connection))
                         {
                             command.Parameters.AddWithValue("@username", username);
